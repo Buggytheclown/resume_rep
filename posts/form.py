@@ -1,5 +1,14 @@
 from django import forms
-from .models import Post, ContactModel
+
+from .models import Post, ContactModel, ProfileModel, CommentModel
+from django.contrib.admin import widgets
+
+class CommentModelForm (forms.ModelForm):
+    class Meta:
+        model = CommentModel
+        fields = [
+            'content',
+        ]
 
 
 class PostModel (forms.ModelForm):
@@ -19,4 +28,16 @@ class ContactForm(forms.ModelForm):
             'email',
             'subject',
             'content',
+        ]
+
+class ProfileForm(forms.ModelForm):
+
+    class Meta:
+        birthdate = forms.DateField(widget=widgets.AdminDateWidget())
+        model = ProfileModel
+        fields = [
+            'first_name',
+            'last_name',
+            'gender',
+            'avatar',
         ]

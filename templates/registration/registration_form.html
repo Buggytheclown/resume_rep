@@ -4,24 +4,23 @@
 
 
 {% block content %}
-<div class='row'>
-{#<div class='col-sm-6 col-sm-offset-3'>#}
-<h1>Register and activate account.</h1>
-<form method="post" action=".">
-  {% csrf_token %}
-  {{ form|crispy }}
+    {#<div class='row'>#}
 
-  <input class='btn btn-block btn-primary' type="submit" value="{% trans 'Join' %}" />
-</form>
-{#</div>#}
-</div>
+    <div class='col-sm-6 col-sm-offset-3'>
+        <h1>Register and activate account.</h1>
+        <form method="post" action=".">
+            {% csrf_token %}
+            {{ form|crispy }}
 
-<hr/>
-<div class='row'>
-<div class='col-sm-6 col-sm-offset-3 text-align-center'>
-<p>Need to <a href="{% url 'auth_login' %}">Login</a>?</p>
-</div>
-</div>
+            <input class='btn btn-block btn-primary' type="submit" value="{% trans 'Join' %}"/>
+        </form>
 
 
+        <hr/>
+        <div class='row'>
+            <div class='col-sm-6 col-sm-offset-3 text-align-center'>
+                <p>Need to <a href="{% url 'auth_login' %}">Login</a>?</p>
+            </div>
+        </div>
+    </div>
 {% endblock %}

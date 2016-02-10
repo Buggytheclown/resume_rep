@@ -22,18 +22,19 @@
 
 {% block content %}
     <div class="col-sm-8 blog-main" style="margin-top: 50px">
-    <h2>{{ form_title }}</h2>
-    {% if form %}
-        <form method="POST">{% csrf_token %}
-            {{ form|crispy }}
-            <input type="submit" value="Send" class="btn btn-primary">
-        </form>
-    {% endif %}
+        <h2>{{ form_title }}</h2>
+        {% if form %}
+            <form method="POST">{% csrf_token %}
+                {{ form|crispy }}
+                <input type="submit" value="Send" class="btn btn-primary">
+            </form>
+        {% endif %}
     </div>
     <div class="col-sm-3 col-sm-offset-1 blog-main" style="margin-top: 50px">
         <h2>Contact information:</h2>
         <p>Artsiom Maratovich Ivanou <br>
             +375(29)164-74-83 <br>
             buggy.the.clown.md@gmail.com </p>
+    </div>
 
 {% endblock %}

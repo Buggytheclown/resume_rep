@@ -31,7 +31,7 @@
 
 <body>
 <!-- Static navbar -->
-<nav class="navbar navbar-inverse navbar-static-top">
+<nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
@@ -48,28 +48,19 @@
                 <li{% block active_home %}{% endblock %}><a href="{% url 'home' %}">Home</a></li>
                 <li{% block active_about %}{% endblock %}><a href="{% url 'about' %}">About</a></li>
                 <li{% block active_contact %}{% endblock %}><a href="{% url 'contact' %}">Contact</a></li>
-                {#                <li class="dropdown">#}
-                {#                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"#}
-                {#                       aria-expanded="false">Dropdown <span class="caret"></span></a>#}
-                {#                    <ul class="dropdown-menu">#}
-                {#                        <li><a href="#">Action</a></li>#}
-                {#                        <li><a href="#">Another action</a></li>#}
-                {#                        <li><a href="#">Something else here</a></li>#}
-                {#                        <li role="separator" class="divider"></li>#}
-                {#                        <li class="dropdown-header">Nav header</li>#}
-                {#                        <li><a href="#">Separated link</a></li>#}
-                {#                        <li><a href="#">One more separated link</a></li>#}
-                {#                    </ul>#}
-                {#                </li>#}
+
             </ul>
 
 
             <ul class="nav navbar-nav navbar-right">
                 {% if request.user.is_authenticated and not '/accounts/login' in request.get_full_path %}
-                    <li><h4 style="margin-top: 18px"> Welcome, {{ request.user }}! </h4></li>
+                    <li><h4 style="margin-top: 18px"> Welcome,<span style="color: cyan "> {{ request.user }}!</span>
+                    </h4></li>
+                    <li><a href="{% url 'profile' %}">Profile</a></li>
                     <li><a href="{% url 'auth_logout' %}">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'registration_register' %}">Register</a></li>
+                    {#                    <li><button style="margin-top: 6px" class="btn btn-default">Register</button> </li>#}
                     {#                    <li><a href="{% url 'auth_login' %}">Login</a></li>#}
                     </ul>
                 {% endif %}
@@ -90,36 +81,19 @@
         </div><!--/.nav-collapse -->
     </div>
 </nav>
+
+
+<div style="margin-top: 80px" class="container">
     {% include 'posts/messages.html' %}
 
     {% block content_title %}
     {% endblock %}
 
-<div class="container">
-
-    {#        <div class="posts-header">#}
-    {#            <h1 class="posts-title">{% block content_title %}Tidjei's Blog {% endblock %}</h1>#}
-    {#            <p class="lead posts-description">{% block content_desription %}The example of creating a posts.{% endblock %}</p>#}
-    {#        </div>#}
     <div style="margin-bottom: 50px" class="row">
+
         {% block content %}
-        <div class="col-sm-8 blog-main col-sm-offset-2" style="margin-top: 50px">
+        {% endblock content %}
 
-
-                {#                <div class="posts-post">#}
-                {#                    <h2 class="posts-post-title">Sample posts post</h2>#}
-                {#                    <p class="posts-post-meta">January 1, 2014 by <a href="#">Mark</a></p>#}
-                {#                </div><!-- /.posts-post -->#}
-                {##}
-                {#                <nav>#}
-                {#                    <ul class="pager">#}
-                {#                        <li><a href="#">Previous</a></li>#}
-                {#                        <li><a href="#">Next</a></li>#}
-                {#                    </ul>#}
-                {#                </nav>#}
-            {% endblock content %}
-
-        </div><!-- /.posts-main -->
 
     </div><!-- /.row -->
 

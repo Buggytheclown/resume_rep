@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^(?P<id>\d+)/delete/$', views.posts_delete, name='delete'),
     url(r'^about/$', views.about, name='about'),
     url(r'^contact/$', views.contact, name='contact'),
+    url(r'^profile/$', views.profile, name='profile'),
+    url(r'^(?P<user_id>\d+)/profile/$', views.view_profile, name='view_profile'),
     ]
 
 if settings.DEBUG:
