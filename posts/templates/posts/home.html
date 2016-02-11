@@ -20,12 +20,21 @@
 {% block content %}
     {#    <div class="col-sm-8 blog-main col-sm-offset-2" style="margin-top: 50px">#}
     <div class="row">
-        <div class="col-sm-6 col-sm-offset-4">
+        <div class="col-sm-4 col-sm-offset-4">
+
             <h1>Tidjei's blog</h1>
             <form method="GET" action="">
-                <input type="text" placeholder="Search post" name="q" value="{{ request.GET.q }}"/>
-                <input type="submit" value="Search"/>
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="Search for..." name="q"
+                           value="{{ request.GET.q }}"/>
+                <span class="input-group-btn">
+                <input type="submit" class="btn btn-info" value="Search"/>
+                    </span>
+                </div>
             </form>
+        </div>
+
+        <div class="col-sm-6 col-sm-offset-4">
             {% if request.user.is_authenticated %}
                 <a style="margin-top: 20px" href="{% url 'create' %}" class="btn btn-success" role="button">Create a
                     Post</a>
@@ -68,26 +77,26 @@
     {% for i in model_title %}
         <div class="row" style="margin-top: 50px">
 
-                    <div class="col-sm-2">
-                    <form method="POST">{% csrf_token %}
-                        <input hidden name="post_id" value="{{ i.id }}">
-                        <input hidden name="user_plus" value="{{ request.user.id }}">
-                        <input type="submit" class="btn btn-success" value="+">
-                    </form>
+            <div class="col-sm-2">
+                <form method="POST">{% csrf_token %}
+                    <input hidden name="post_id" value="{{ i.id }}">
+                    <input hidden name="user_plus" value="{{ request.user.id }}">
+                    <input type="submit" class="btn btn-success" value="+">
+                </form>
 
-                    <strong>Rating: {{ i.get_rating }}</strong>
-                    <br>
+                <strong>Rating: {{ i.get_rating }}</strong>
+                <br>
 
-                    <form method="POST">{% csrf_token %}
-                        <input hidden name="post_id" value="{{ i.id }}">
-                        <input hidden name="user_minus" value="{{ request.user.id }}">
-                        <input type="submit" class="btn btn-danger" value="-">
-                    </form>
-                </div>
+                <form method="POST">{% csrf_token %}
+                    <input hidden name="post_id" value="{{ i.id }}">
+                    <input hidden name="user_minus" value="{{ request.user.id }}">
+                    <input type="submit" class="btn btn-danger" value="-">
+                </form>
+            </div>
 
 
-        <div class="col-sm-10">
-                    <h3>{{ i.title }}</h3> <br>
+            <div class="col-sm-10">
+                <h3>{{ i.title }}</h3> <br>
                         <span><small>{{ i.updated|timesince }} ago</small>
 
                     <p>Author:<a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a></p></span>

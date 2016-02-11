@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils.datastructures import MultiValueDictKeyError
 
 from .form import PostModel, ContactForm, ProfileForm, CommentModelForm
 from posts.models import Post, ProfileModel, CommentModel, PlusModel, MinusModel, ContactModel
@@ -20,6 +21,8 @@ def view_profile(request, user_id):
 
 
 def profile(request):
+    if not request.user.is_authenticated():
+        return redirect('registration_register')
     try:
         profile = request.user.profilemodel
     except ProfileModel.DoesNotExist:
@@ -29,7 +32,7 @@ def profile(request):
         form_profile = ProfileForm(request.POST, request.FILES, instance=profile)
         if form_profile.is_valid():
             form_profile.save()
-            return redirect('home')
+            # return redirect('home')
     else:
         form_profile = ProfileForm(instance=profile)
 
@@ -92,9 +95,22 @@ def posts_list(request):
         user_minus = ''
         try:
             user_plus = request.POST['user_plus']
-        except:
+        except MultiValueDictKeyError:
             user_minus = request.POST['user_minus']
-
+        # if user rewrite hidden form
+        if user_plus:
+            if int(user_plus) == request.user.id:
+                pass
+            else:
+                messages.error(request, "Don't try to fuck me up!!11")
+                return redirect('home')
+        if user_minus:
+            if int(user_minus) == request.user.id:
+                pass
+            else:
+                messages.error(request, "Don't try to fuck me up!!11")
+                return redirect('home')
+        # just normal plus/minus logic
         if user_plus:
             if PlusModel.objects.filter(on_rating=post, user_plus=user_plus):
                 pass
@@ -125,7 +141,7 @@ def posts_list(request):
 
 def posts_create(request):
     if not request.user.is_authenticated() and not request.user.is_superuser:
-        raise Http404
+        return redirect('registration_register')
     form = PostModel(request.POST or None, request.FILES or None)
     if form.is_valid():
         instance = form.save(commit=False)
@@ -149,7 +165,7 @@ def posts_detail(request, id=None):
         pre_form.user = request.user
         pre_form.in_post_id = id
         pre_form.save()
-        return HttpResponseRedirect(instance.get_absolute_url())
+        # return HttpResponseRedirect(instance.get_absolute_url())
 
     rating_form = request.POST.get('post_id', False)
     if request.method == 'POST' and rating_form and not request.user.is_authenticated():
@@ -162,9 +178,22 @@ def posts_detail(request, id=None):
         user_minus = ''
         try:
             user_plus = request.POST['user_plus']
-        except:
+        except MultiValueDictKeyError:
             user_minus = request.POST['user_minus']
-
+        # if user rewrite hidden form
+        if user_plus:
+            if int(user_plus) == request.user.id:
+                pass
+            else:
+                messages.error(request, "Don't try to fuck me up!!11")
+                return redirect('home')
+        if user_minus:
+            if int(user_minus) == request.user.id:
+                pass
+            else:
+                messages.error(request, "Don't try to fuck me up!!11")
+                return redirect('home')
+        # just normal plus/minus logic
         if user_plus:
             if PlusModel.objects.filter(on_rating=post, user_plus=user_plus):
                 pass

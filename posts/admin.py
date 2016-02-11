@@ -24,7 +24,7 @@ admin.site.register(ProfileModel)
 
 class CommentModelAdmin (admin.ModelAdmin):
     list_display = ['in_post', 'user', 'content', 'timestamp']
-    list_filter = ['in_post']
+    list_filter = ['in_post',]
 admin.site.register(CommentModel, CommentModelAdmin)
 
 admin.site.register(PlusModel)
