@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from posts.models import Post, ContactModel, ProfileModel, CommentModel
+from posts.models import Post, ContactModel, ProfileModel, CommentModel, PlusModel, MinusModel
 
 
 class PostModelAdmin (admin.ModelAdmin):
@@ -26,3 +26,6 @@ class CommentModelAdmin (admin.ModelAdmin):
     list_display = ['in_post', 'user', 'content', 'timestamp']
     list_filter = ['in_post']
 admin.site.register(CommentModel, CommentModelAdmin)
+
+admin.site.register(PlusModel)
+admin.site.register(MinusModel)

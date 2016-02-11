@@ -5,10 +5,26 @@ from django.db import models
 
 # Create your models here.
 
+class PlusModel(models.Model):
+    on_rating = models.ForeignKey('Post')
+    user_plus = models.PositiveIntegerField()
+
+
+    def __str__(self):
+        return str(self.user_plus)
+
+
+class MinusModel(models.Model):
+    on_rating = models.ForeignKey('Post')
+    user_minus = models.PositiveIntegerField()
+
+    def __str__(self):
+        return str(self.user_minus)
+
 class CommentModel(models.Model):
     user = models.ForeignKey(User)
     in_post = models.ForeignKey('Post')
-    content = models.TextField('Your comment', max_length=300)
+    content = models.TextField('Your comment', max_length=600)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     def get_absolute_url(self):
@@ -27,6 +43,11 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('detail', kwargs={'id': self.id})
+
+    def get_rating(self):
+        plus = PlusModel.objects.filter(on_rating=self.id).count()
+        minus = MinusModel.objects.filter(on_rating=self.id).count()
+        return plus - minus
 
     class Meta:
         ordering = ["-updated", "-timestamp"]
@@ -61,6 +82,15 @@ class ProfileModel (models.Model):
         (Other, 'Other'),
     )
     gender = models.CharField(max_length=3, choices=gender_choices, default=Other)
+
+    def get_user_score(self):
+        posts = Post.objects.filter(user=self.user)
+        plus = 0
+        minus = 0
+        for post in posts:
+            plus += PlusModel.objects.filter(on_rating=post).count()
+            minus += MinusModel.objects.filter(on_rating=post).count()
+        return plus - minus
 
     def __str__(self):
         return self.user.get_username()

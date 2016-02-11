@@ -21,20 +21,37 @@
 
 
 {% block content %}
-    <div class="col-sm-8 blog-main" style="margin-top: 50px">
-        <h2>{{ form_title }}</h2>
-        {% if form %}
-            <form method="POST">{% csrf_token %}
-                {{ form|crispy }}
-                <input type="submit" value="Send" class="btn btn-primary">
-            </form>
+    {% if not request.user.is_superuser %}
+        <div class="col-sm-8 blog-main" style="margin-top: 50px">
+            <h2>{{ form_title }}</h2>
+            {% if form %}
+                <form method="POST">{% csrf_token %}
+                    {{ form|crispy }}
+                    <input type="submit" value="Send" class="btn btn-primary">
+                </form>
+            {% endif %}
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-main" style="margin-top: 50px">
+            <h2>Contact information:</h2>
+            <p>Artsiom Maratovich Ivanou <br>
+                +375(29)164-74-83 <br>
+                buggy.the.clown.md@gmail.com </p>
+        </div>
+    {% else %}
+        {% if contacts %}
+            {% for contact in contacts %}
+                <div class="row" style="margin-bottom: 20px">
+                    <strong>Name/Organization: </strong>{{ contact.name }}<br>
+                    <strong>Email:</strong> {{ contact.email }}<br>
+                    <strong>Subject: </strong>{{ contact.subject }}<br>
+                    <strong>Content: </strong>{{ contact.content }}<br>
+                    <strong>Timestamp: </strong>{{ contact.timestamp }}<br>
+                    <form method="POST"> {% csrf_token %}
+                        <input hidden name="contact_id" value="{{ contact.id }}">
+                        <input type="submit" class="btn btn-danger" value="Delete">
+                    </form>
+                </div>
+            {% endfor %}
         {% endif %}
-    </div>
-    <div class="col-sm-3 col-sm-offset-1 blog-main" style="margin-top: 50px">
-        <h2>Contact information:</h2>
-        <p>Artsiom Maratovich Ivanou <br>
-            +375(29)164-74-83 <br>
-            buggy.the.clown.md@gmail.com </p>
-    </div>
-
+    {% endif %}
 {% endblock %}

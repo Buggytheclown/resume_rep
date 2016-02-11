@@ -35,7 +35,9 @@
         {% endif %}
         <br>
         Date of join Tidjei's blog: <br>
-        {{ user.date_joined|date }}
+        {{ user.date_joined|date }}<br>
+        Total user's posts rating: {{ user.profilemodel.get_user_score }}
+
     </div>
 
     <br>
@@ -46,29 +48,30 @@
     </div>
 
     {% for i in user_post %}
-        <div class="row" style="margin-top: 50px">
-            <div class="col-sm-10 col-sm-offset-1">
-                <div class="thumbnail">
-                    <h3>{{ i.title }} <br>
-                        <small>{{ i.updated|timesince }} ago</small>
-                    </h3>
-                    <p>Author:<a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a></p>
-                    {% if i.image %}
-                        <img src="{{ i.image.url }}" class="img-responsive"/>
-                    {% endif %}
-
-                    <div class="caption">
-                        <p>{{ i.content|linebreaks|truncatechars:500 }}</p>
-                        <p><a href="{{ i.get_absolute_url }}" class="btn btn-primary" role="button">View</a>
-                            {% if request.user == i.user or request.user.is_superuser %}
-                                <a href="{% url 'update' i.id %}" class="btn btn-info"
-                                   role="button">Edit</a>
-                                <a href="{% url 'delete' i.id %}" class="btn btn-warning" role="button">Delete</a>
-                                </p>
-                            {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
+{#        <div class="row" style="margin-top: 50px">#}
+{#            <div class="col-sm-10 col-sm-offset-1">#}
+{#                <div class="thumbnail">#}
+{#                    <h3>{{ i.title }} <br>#}
+{#                        <small>{{ i.updated|timesince }} ago</small>#}
+{#                    </h3>#}
+{#                    <p>Author:<a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a></p>#}
+{#                    {% if i.image %}#}
+{#                        <img src="{{ i.image.url }}" class="img-responsive"/>#}
+{#                    {% endif %}#}
+{##}
+{#                    <div class="caption">#}
+{#                        <p>{{ i.content|linebreaks|truncatechars:500 }}</p>#}
+{#                        <p><a href="{{ i.get_absolute_url }}" class="btn btn-primary" role="button">View</a>#}
+{#                            {% if request.user == i.user or request.user.is_superuser %}#}
+{#                                <a href="{% url 'update' i.id %}" class="btn btn-info"#}
+{#                                   role="button">Edit</a>#}
+{#                                <a href="{% url 'delete' i.id %}" class="btn btn-warning" role="button">Delete</a>#}
+{#                                </p>#}
+{#                            {% endif %}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+        {% include 'posts/view_post_list.html' %}
     {% endfor %}
 {% endblock %}

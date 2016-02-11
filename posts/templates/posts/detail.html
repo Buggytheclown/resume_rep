@@ -1,43 +1,97 @@
 {% extends 'posts/base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}
     Detail
 {% endblock %}
 
+{% block style %}
+    .thumbnail {
+    padding:0px;
+    }
+    .panel {
+    position:relative;
+    }
+    .panel>.panel-heading:after,.panel>.panel-heading:before{
+    position:absolute;
+    top:11px;left:-16px;
+    right:100%;
+    width:0;
+    height:0;
+    display:block;
+    content:" ";
+    border-color:transparent;
+    border-style:solid solid outset;
+    pointer-events:none;
+    }
+    .panel>.panel-heading:after{
+    border-width:7px;
+    border-right-color:#f7f7f7;
+    margin-top:1px;
+    margin-left:2px;
+    }
+    .panel>.panel-heading:before{
+    border-right-color:#ddd;
+    border-width:8px;
+    }
+{% endblock %}
+
 {% block content %}
-    <div class="row">
-        <div class="col-sm-10 col-sm-offset-1">
+
+    <div class="row" style="margin-top: 50px">
+
+        <div class="col-sm-2">
+            <form method="POST">{% csrf_token %}
+                <input hidden name="post_id" value="{{ instance.id }}">
+                <input hidden name="user_plus" value="{{ request.user.id }}">
+                <input type="submit" name="rating" class="btn btn-success" value="+">
+            </form>
+
+            <strong>Rating: {{ instance.get_rating }}</strong>
+            <br>
+
+            <form method="POST">{% csrf_token %}
+                <input hidden name="post_id" value="{{ instance.id }}">
+                <input hidden name="user_minus" value="{{ request.user.id }}">
+                <input type="submit" name="rating" class="btn btn-danger" value="-">
+            </form>
+        </div>
+
+
+        <div class="col-sm-10">
+            <h3>{{ title }}</h3> <br>
+                        <span><small>{{ instance.updated|timesince }} ago</small>
+
+                    <p>Author:<a href="{% url 'view_profile' instance.user.id %}"> {{ instance.user }} </a></p></span>
+
+
             <div class="thumbnail">
-                <h1>{{ title }} <br>
-                    <small>{{ instance.timestamp|timesince }} ago</small>
-                </h1>
-                <br>
-                <p>Author:<a href="{% url 'view_profile' instance.user.id %}"> {{ instance.user }} </a></p>
                 {% if instance.image %}
                     <img src="{{ instance.image.url }}" class="img-responsive"/>
                 {% endif %}
-                <p>{{ instance.content|linebreaks }}</p> <br>
+
+                <div class="caption">
+                    <p>{{ instance.content|linebreaks|truncatechars:600 }}</p>
+                    <p>
+                        {% if request.user == instance.user or request.user.is_superuser %}
+                            <a href="{% url 'update' instance.id %}" class="btn btn-info"
+                               role="button">Edit</a>
+                            <a href="{% url 'delete' instance.id %}" class="btn btn-warning" role="button">Delete</a>
+                            </p>
+                        {% endif %}
+                </div>
             </div>
         </div>
     </div>
 
 
     <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
-            <h2>Comments:</h2><br>
-            {% for i in comments %}
-                <small><a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a>
-                    sended {{ i.timestamp|timesince }} ago
-                </small> <br>
-                <p>{{ i.content|linebreaks }}</p>
-                <hr>
-            {% endfor %}
-
+        <div style="margin-bottom: 30px" class="col-sm-6  col-sm-offset-4">
             {% if request.user.is_authenticated %}
                 <form method="POST">{% csrf_token %}
                     {{ form|crispy }}
-                    <input type="submit" value="Send" class="btn btn-primary">
+                    <input type="submit" value="Send" name="Send" class="btn btn-primary">
                 </form>
             {% else %}
                 <p style="color: red"> You must be <a href="{% url 'auth_login' %}"> logged in </a> to comment.<br>
@@ -45,4 +99,34 @@
             {% endif %}
         </div>
     </div>
+
+
+    {% for i in comments %}
+        <div class="row">
+            <div class="col-sm-1 col-sm-offset-3">
+                <div class="thumbnail">
+                    {% if i.user.profilemodel.avatar %}
+                        <img class="img-responsive user-photo" src="{{ i.user.profilemodel.avatar.url }}">
+                    {% else %}
+                        <img class="img-responsive user-photo" src="{% static 'posts/img/unregistered.png' %}">
+                    {% endif %}
+                </div><!-- /thumbnail -->
+            </div><!-- /col-sm-1 -->
+
+            <div class="col-sm-6 ">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <strong><a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a></strong> <span
+                            class="text-muted">commented {{ i.timestamp|timesince }} ago</span>
+                    </div>
+                    <div class="panel-body">
+                        {{ i.content|linebreaks }}
+                    </div><!-- /panel-body -->
+                </div><!-- /panel panel-default -->
+            </div><!-- /col-sm-5 -->
+        </div><!-- /row -->
+    {% endfor %}
+
+
+    </div><!-- /container -->
 {% endblock %}

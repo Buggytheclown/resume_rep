@@ -3,15 +3,18 @@ from django import forms
 from .models import Post, ContactModel, ProfileModel, CommentModel
 from django.contrib.admin import widgets
 
-class CommentModelForm (forms.ModelForm):
+class CommentModelForm(forms.ModelForm):
     class Meta:
         model = CommentModel
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4, 'cols': 15}),
+        }
         fields = [
             'content',
         ]
 
 
-class PostModel (forms.ModelForm):
+class PostModel(forms.ModelForm):
     class Meta:
         model = Post
         fields = [
@@ -20,9 +23,13 @@ class PostModel (forms.ModelForm):
             'image',
         ]
 
+
 class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactModel
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4, 'cols': 15}),
+        }
         fields = [
             'name',
             'email',
@@ -30,8 +37,8 @@ class ContactForm(forms.ModelForm):
             'content',
         ]
 
-class ProfileForm(forms.ModelForm):
 
+class ProfileForm(forms.ModelForm):
     class Meta:
         birthdate = forms.DateField(widget=widgets.AdminDateWidget())
         model = ProfileModel
