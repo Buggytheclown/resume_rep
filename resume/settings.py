@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'resume.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
+#
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -90,6 +90,18 @@ DATABASES = {
     }
 }
 
+# 'ENGINE': 'django.db.backends.mysql',
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'default',
+#         'USER': 'Tidjei',
+#         'PASSWORD': 'buggy2497672',
+#         'HOST': 'Tidjei.mysql.pythonanywhere-services.com',   # Or an IP Address that your DB is hosted on
+#         'PORT': '3306',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators

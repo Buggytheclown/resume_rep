@@ -21,7 +21,11 @@
     {#    <div class="col-sm-8 blog-main col-sm-offset-2" style="margin-top: 50px">#}
     <div class="row">
         <div class="col-sm-4 col-sm-offset-4">
-
+            <div class="row" style="margin-bottom: 30px">
+                <a href="{% url 'home' %}" class="btn btn-sm btn-info" role="button">New posts</a>
+                <a href="{% url 'home_top' %}" class="btn btn-sm btn-info" role="button">Top rated posts</a>
+                <a href="{% url 'home_old' %}" class="btn btn-sm btn-info" role="button">Old posts</a>
+            </div>
             <h1>Tidjei's blog</h1>
             <form method="GET" action="">
                 <div class="input-group">
@@ -39,9 +43,6 @@
                 <a style="margin-top: 20px" href="{% url 'create' %}" class="btn btn-success" role="button">Create a
                     Post</a>
             {% else %}
-                {#                <a style="margin-top: 20px" href="#" class="btn btn-danger" role="button">Create a#}
-                {#                    Post</a>#}
-
                 <button style="margin-top: 20px" type="button" class="btn btn-danger" data-toggle="modal"
                         data-target=".bs-example-modal-sm">
                     Create a Post
@@ -67,9 +68,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
             {% endif %}
         </div>
     </div>
@@ -77,19 +75,17 @@
     {% for i in model_title %}
         <div class="row" style="margin-top: 50px">
 
-            <div class="col-sm-2">
-                <form method="POST">{% csrf_token %}
-                    <input hidden name="post_id" value="{{ i.id }}">
-                    <input hidden name="user_plus" value="{{ request.user.id }}">
-                    <input type="submit" class="btn btn-success" value="+">
+            <div class="col-sm-2" id="post_{{ i.id }}">
+                <form method="POST" {% if user.is_authenticated %} action="#post_{{ i.id }} {% endif %}">{% csrf_token %}
+                    <input hidden name="vote_up" value="{{ i.id }}">
+                   <input type="submit" class="btn btn-success" value="+">
                 </form>
 
                 <strong>Rating: {{ i.get_rating }}</strong>
                 <br>
 
-                <form method="POST">{% csrf_token %}
-                    <input hidden name="post_id" value="{{ i.id }}">
-                    <input hidden name="user_minus" value="{{ request.user.id }}">
+                <form method="POST" {% if user.is_authenticated %} action="#post_{{ i.id }} {% endif %}">{% csrf_token %}
+                    <input hidden name="vote_down" value="{{ i.id }}">
                     <input type="submit" class="btn btn-danger" value="-">
                 </form>
             </div>
@@ -121,28 +117,60 @@
             </div>
         </div>
     {% endfor %}
+{##}
+{##}
+{# OLD default PAGINATOR #}
+{#    <div class="row">#}
+{#        <div class="col-sm-6 col-sm-offset-5">#}
+{#            <div class="pagination">#}
+{##}
+{#    <span class="step-links">#}
+{#        {% if model_title.has_previous %}#}
+{#            <a href="?page={{ model_title.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>#}
+{#        {% endif %}#}
+{##}
+{#        <span class="current">#}
+{#            Page {{ model_title.number }} of {{ model_title.paginator.num_pages }}.#}
+{#        </span>#}
+{##}
+{#        {% if model_title.has_next %}#}
+{#            <a href="?page={{ model_title.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>#}
+{#        {% endif %}#}
+{#    </span>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
 
 
     <div class="row">
         <div class="col-sm-6 col-sm-offset-5">
-            <div class="pagination">
-    <span class="step-links">
-        {% if model_title.has_previous %}
-            <a href="?page={{ model_title.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}
-            {% endif %}">previous</a>
-        {% endif %}
+            <ul class="pagination">
 
-        <span class="current">
-            Page {{ model_title.number }} of {{ model_title.paginator.num_pages }}.
-        </span>
+                {% if model_title.has_previous %}
+                <li class="page-item">
 
-        {% if model_title.has_next %}
-            <a href="?page={{ model_title.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}
-            {% endif %}">next</a>
-        {% endif %}
-    </span>
-            </div>
+                    <a class="page-link" href="?page={{ model_title.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for p in model_title.paginator.page_range %}
+                <li class="page-item"><a class="page-link" href="?page={{ forloop.counter }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ forloop.counter }}</a></li>
+                {% endfor %}
+
+                {% if model_title.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ model_title.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                    {% endif %}
+
+                </li>
+            </ul>
         </div>
     </div>
 {% endblock %}

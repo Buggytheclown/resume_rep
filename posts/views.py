@@ -32,6 +32,7 @@ def profile(request):
         form_profile = ProfileForm(request.POST, request.FILES, instance=profile)
         if form_profile.is_valid():
             form_profile.save()
+            messages.success(request, 'Your profile was successfully edited')
             # return redirect('home')
     else:
         form_profile = ProfileForm(instance=profile)
@@ -60,15 +61,23 @@ def contact(request):
         ContactModel.objects.filter(id=contact_id).delete()
     contacts = ContactModel.objects.all()
     context = {
-        'contacts':contacts,
+        'contacts': contacts,
         'form_title': form_title,
         'form': form,
     }
     return render(request, 'posts/contact.html', context)
 
 
-def posts_list(request):
-    model_title = Post.objects.all()
+def posts_list(request, sort=''):
+    # sort
+    if not sort:
+        model_title = Post.objects.all()
+    elif sort == 'top':
+        unsorted_results = Post.objects.all()
+        model_title = sorted(unsorted_results, key= lambda t: t.get_rating(), reverse=True)
+    elif sort == 'old':
+        model_title = Post.objects.all().reverse()
+     # paginator
     query = request.GET.get('q')
     if query:
         model_title = Post.objects.all().filter(title__icontains=query)
@@ -83,55 +92,42 @@ def posts_list(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         model_title_p = paginator.page(paginator.num_pages)
 
-        # rating in post, user can vote by adding 1 to plus OR 1 minus
-    rating_form = request.POST.get('post_id', False)
-    if request.method == 'POST' and rating_form and not request.user.is_authenticated():
-        messages.error(request,'Please register or login to vote')
+    # rating in post, user can vote by adding 1 to plus OR 1 minus
+    vote_up = request.POST.get('vote_up', '')
+    vote_down = request.POST.get('vote_down', '')
+    vote_valid = False
+    if vote_up or vote_down:
+        vote_valid = True
 
-    if request.method == 'POST' and rating_form and request.user.is_authenticated():
-        post_id = request.POST['post_id']
-        post = get_object_or_404(Post, id=post_id)
-        user_plus = ''
-        user_minus = ''
-        try:
-            user_plus = request.POST['user_plus']
-        except MultiValueDictKeyError:
-            user_minus = request.POST['user_minus']
-        # if user rewrite hidden form
-        if user_plus:
-            if int(user_plus) == request.user.id:
-                pass
-            else:
-                messages.error(request, "Don't try to fuck me up!!11")
-                return redirect('home')
-        if user_minus:
-            if int(user_minus) == request.user.id:
-                pass
-            else:
-                messages.error(request, "Don't try to fuck me up!!11")
-                return redirect('home')
+    if not request.user.is_authenticated() and vote_valid:
+        messages.error(request, 'Please register or login to vote')
+
+    if vote_valid and request.user.is_authenticated():
         # just normal plus/minus logic
-        if user_plus:
-            if PlusModel.objects.filter(on_rating=post, user_plus=user_plus):
+        user_vote = request.user.id
+        if vote_up:
+            post = get_object_or_404(Post, id=vote_up)
+            if PlusModel.objects.filter(on_rating=post, user_plus=user_vote):
                 pass
-                messages.error(request,'You already added positive vote to this post')
-            elif MinusModel.objects.filter(on_rating=post, user_minus=user_plus):
-                MinusModel.objects.filter(on_rating=post, user_minus=user_plus).delete()
-                messages.info(request, 'Your negative vote was successfully removed')
+                # messages.error(request, 'You already added positive vote to this post')
+            elif MinusModel.objects.filter(on_rating=post, user_minus=user_vote):
+                MinusModel.objects.filter(on_rating=post, user_minus=user_vote).delete()
+                # messages.info(request, 'Your negative vote was successfully removed')
             else:
-                PlusModel(on_rating=post, user_plus=user_plus).save()
-                messages.success(request, 'Your positive vote was successfully added')
+                PlusModel(on_rating=post, user_plus=user_vote).save()
+                # messages.success(request, 'Your positive vote was successfully added')
 
-        if user_minus:
-            if MinusModel.objects.filter(on_rating=post, user_minus=user_minus):
+        if vote_down:
+            post = get_object_or_404(Post, id=vote_down)
+            if MinusModel.objects.filter(on_rating=post, user_minus=user_vote):
                 pass
-                messages.error(request,'You already added negative vote to this post')
-            elif PlusModel.objects.filter(on_rating=post, user_plus=user_minus):
-                PlusModel.objects.filter(on_rating=post, user_plus=user_minus).delete()
-                messages.info(request, 'Your positive vote was successfully removed')
+                # messages.error(request, 'You already added negative vote to this post')
+            elif PlusModel.objects.filter(on_rating=post, user_plus=user_vote):
+                PlusModel.objects.filter(on_rating=post, user_plus=user_vote).delete()
+                # messages.info(request, 'Your positive vote was successfully removed')
             else:
-                MinusModel(on_rating=post, user_minus=user_minus).save()
-                messages.success(request, 'Your negative vote was successfully added')
+                MinusModel(on_rating=post, user_minus=user_vote).save()
+                # messages.success(request, 'Your negative vote was successfully added')
 
     context = {
         'model_title': model_title_p,
@@ -165,55 +161,44 @@ def posts_detail(request, id=None):
         pre_form.user = request.user
         pre_form.in_post_id = id
         pre_form.save()
-        # return HttpResponseRedirect(instance.get_absolute_url())
+        form = CommentModelForm()
+        #return HttpResponseRedirect(instance.get_absolute_url())
 
-    rating_form = request.POST.get('post_id', False)
-    if request.method == 'POST' and rating_form and not request.user.is_authenticated():
-        messages.error(request,'Please register or login to vote')
+    # rating in post, user can vote by adding 1 to plus OR 1 minus
+    vote_up = request.POST.get('vote_up', '')
+    vote_down = request.POST.get('vote_down', '')
+    vote_valid = False
+    if vote_up or vote_down:
+        vote_valid = True
 
-    if request.method == 'POST' and rating_form and request.user.is_authenticated():
-        post_id = request.POST['post_id']
-        post = get_object_or_404(Post, id=post_id)
-        user_plus = ''
-        user_minus = ''
-        try:
-            user_plus = request.POST['user_plus']
-        except MultiValueDictKeyError:
-            user_minus = request.POST['user_minus']
-        # if user rewrite hidden form
-        if user_plus:
-            if int(user_plus) == request.user.id:
-                pass
-            else:
-                messages.error(request, "Don't try to fuck me up!!11")
-                return redirect('home')
-        if user_minus:
-            if int(user_minus) == request.user.id:
-                pass
-            else:
-                messages.error(request, "Don't try to fuck me up!!11")
-                return redirect('home')
+    if not request.user.is_authenticated() and vote_valid:
+        messages.error(request, 'Please register or login to vote')
+
+    if vote_valid and request.user.is_authenticated():
         # just normal plus/minus logic
-        if user_plus:
-            if PlusModel.objects.filter(on_rating=post, user_plus=user_plus):
+        user_vote = request.user.id
+        if vote_up:
+            post = get_object_or_404(Post, id=vote_up)
+            if PlusModel.objects.filter(on_rating=post, user_plus=user_vote):
                 pass
-                messages.error(request,'You already added positive vote to this post')
-            elif MinusModel.objects.filter(on_rating=post, user_minus=user_plus):
-                MinusModel.objects.filter(on_rating=post, user_minus=user_plus).delete()
+                messages.error(request, 'You already added positive vote to this post')
+            elif MinusModel.objects.filter(on_rating=post, user_minus=user_vote):
+                MinusModel.objects.filter(on_rating=post, user_minus=user_vote).delete()
                 messages.info(request, 'Your negative vote was successfully removed')
             else:
-                PlusModel(on_rating=post, user_plus=user_plus).save()
+                PlusModel(on_rating=post, user_plus=user_vote).save()
                 messages.success(request, 'Your positive vote was successfully added')
 
-        if user_minus:
-            if MinusModel.objects.filter(on_rating=post, user_minus=user_minus):
+        if vote_down:
+            post = get_object_or_404(Post, id=vote_down)
+            if MinusModel.objects.filter(on_rating=post, user_minus=user_vote):
                 pass
-                messages.error(request,'You already added negative vote to this post')
-            elif PlusModel.objects.filter(on_rating=post, user_plus=user_minus):
-                PlusModel.objects.filter(on_rating=post, user_plus=user_minus).delete()
+                messages.error(request, 'You already added negative vote to this post')
+            elif PlusModel.objects.filter(on_rating=post, user_plus=user_vote):
+                PlusModel.objects.filter(on_rating=post, user_plus=user_vote).delete()
                 messages.info(request, 'Your positive vote was successfully removed')
             else:
-                MinusModel(on_rating=post, user_minus=user_minus).save()
+                MinusModel(on_rating=post, user_minus=user_vote).save()
                 messages.success(request, 'Your negative vote was successfully added')
 
     context = {

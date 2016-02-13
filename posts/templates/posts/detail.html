@@ -43,18 +43,16 @@
 
         <div class="col-sm-2">
             <form method="POST">{% csrf_token %}
-                <input hidden name="post_id" value="{{ instance.id }}">
-                <input hidden name="user_plus" value="{{ request.user.id }}">
-                <input type="submit" name="rating" class="btn btn-success" value="+">
+                <input hidden name="vote_up" value="{{ instance.id }}">
+                <input type="submit" class="btn btn-success" value="+">
             </form>
 
             <strong>Rating: {{ instance.get_rating }}</strong>
             <br>
 
             <form method="POST">{% csrf_token %}
-                <input hidden name="post_id" value="{{ instance.id }}">
-                <input hidden name="user_minus" value="{{ request.user.id }}">
-                <input type="submit" name="rating" class="btn btn-danger" value="-">
+                <input hidden name="vote_down" value="{{ instance.id }}">
+                <input type="submit" class="btn btn-danger" value="-">
             </form>
         </div>
 
@@ -86,19 +84,7 @@
     </div>
 
 
-    <div class="row">
-        <div style="margin-bottom: 30px" class="col-sm-6  col-sm-offset-4">
-            {% if request.user.is_authenticated %}
-                <form method="POST">{% csrf_token %}
-                    {{ form|crispy }}
-                    <input type="submit" value="Send" name="Send" class="btn btn-primary">
-                </form>
-            {% else %}
-                <p style="color: red"> You must be <a href="{% url 'auth_login' %}"> logged in </a> to comment.<br>
-                    Do you wanna <a href="{% url 'registration_register' %}"> register?</a></p>
-            {% endif %}
-        </div>
-    </div>
+
 
 
     {% for i in comments %}
@@ -126,7 +112,19 @@
             </div><!-- /col-sm-5 -->
         </div><!-- /row -->
     {% endfor %}
-
+    <div class="row">
+        <div style="margin-bottom: 30px" class="col-sm-6  col-sm-offset-4">
+            {% if request.user.is_authenticated %}
+                <form method="POST">{% csrf_token %}
+                    {{ form|crispy }}
+                    <input type="submit" value="Send" name="Send" class="btn btn-primary">
+                </form>
+            {% else %}
+                <p style="color: red"> You must be <a href="{% url 'auth_login' %}"> logged in </a> to comment.<br>
+                    Do you wanna <a href="{% url 'registration_register' %}"> register?</a></p>
+            {% endif %}
+        </div>
+    </div>
 
     </div><!-- /container -->
 {% endblock %}

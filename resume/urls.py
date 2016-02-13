@@ -25,6 +25,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('registration.backends.simple.urls')),
     url(r'^$', views.posts_list, name='home'),
+    url(r'^top/$', views.posts_list,{'sort':'top'}, name='home_top'),
+    url(r'^old/$', views.posts_list,{'sort':'old'}, name='home_old'),
     url(r'^create/$', views.posts_create, name='create'),
     url(r'^(?P<id>\d+)/$', views.posts_detail, name='detail'),
     url(r'^(?P<id>\d+)/edit/$', views.posts_update, name='update'),
