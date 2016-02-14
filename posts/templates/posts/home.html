@@ -1,5 +1,15 @@
 {% extends 'posts/base.html' %}
+{% load static %}
 
+{% block style %}
+    .fa {
+    padding-right:10px
+    }
+
+    .just-glyph {
+    padding-left:15px
+    }
+{% endblock %}
 
 {% block title %}
     Home
@@ -18,9 +28,9 @@
 {% endblock %}
 
 {% block content %}
-    {#    <div class="col-sm-8 blog-main col-sm-offset-2" style="margin-top: 50px">#}
+    <div class="container-full">
     <div class="row">
-        <div class="col-sm-4 col-sm-offset-4">
+        <div class="col-sm-4 col-sm-offset-3">
             <div class="row" style="margin-bottom: 30px">
                 <a href="{% url 'home' %}" class="btn btn-sm btn-info" role="button">New posts</a>
                 <a href="{% url 'home_top' %}" class="btn btn-sm btn-info" role="button">Top rated posts</a>
@@ -38,11 +48,47 @@
             </form>
         </div>
 
-        <div class="col-sm-6 col-sm-offset-4">
-            {% if request.user.is_authenticated %}
-                <a style="margin-top: 20px" href="{% url 'create' %}" class="btn btn-success" role="button">Create a
-                    Post</a>
-            {% else %}
+
+{#------------------------------------------#}
+            {% if user.is_authenticated %}
+            <div class="col-sm-1 col-sm-offset-1">
+                <div class="thumbnail">
+                    {% if user.profilemodel.avatar %}
+                        <img class="img-responsive user-photo" src="{{ user.profilemodel.avatar.url }}">
+                    {% else %}
+                        <img class="img-responsive user-photo" src="{% static 'posts/img/unregistered.png' %}">
+                    {% endif %}
+                </div><!-- /thumbnail -->
+            </div><!-- /col-sm-1 -->
+
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <strong><span class="text-muted">{{ user }}</span></strong>
+{#                        <a href="{% url 'profile' %}">Settings </a><i class="fa fa-cog"></i>#}
+                    </div>
+                    <div class="panel-body">
+                        <i class="fa fa-line-chart"></i> Rating: {{ user.profilemodel.get_user_score }}<br>
+                        <i class="fa fa-pencil-square-o"></i> Posts: {{ user.profilemodel.get_posts_count }} <br>
+                        <i class="fa fa-commenting-o"></i>Comments:{{ user.profilemodel.get_comment_count }}<br>
+                        <i class="fa fa-calendar"></i>Together:{{ user.date_joined|timesince }}<br>
+                        <i class="fa fa-envelope-o"></i> <a href="{% url 'my_mails' %}">My messages: <span class="badge">{{ user.profilemodel.get_mail_count}}</span></a><br>
+
+                        <a style="margin-top: 5px" href="{% url 'create' %}" class="btn btn-success" role="button">Create a Post</a>
+                    </div><!-- /panel-body -->
+                </div><!-- /panel panel-default -->
+            </div><!-- /col-sm-5 -->
+            {% endif %}
+{#------------------------------------------#}
+
+
+
+
+        <div class="col-sm-6 col-sm-offset-3">
+            {% if not request.user.is_authenticated %}
+{#                <a style="margin-top: 20px" href="{% url 'create' %}" class="btn btn-success" role="button">Create a#}
+{#                    Post</a>#}
+{#            {% else %}#}
                 <button style="margin-top: 20px" type="button" class="btn btn-danger" data-toggle="modal"
                         data-target=".bs-example-modal-sm">
                     Create a Post
@@ -71,6 +117,9 @@
             {% endif %}
         </div>
     </div>
+</div>
+
+
 
     {% for i in model_title %}
         <div class="row" style="margin-top: 50px">
@@ -78,7 +127,10 @@
             <div class="col-sm-2" id="post_{{ i.id }}">
                 <form method="POST" {% if user.is_authenticated %} action="#post_{{ i.id }} {% endif %}">{% csrf_token %}
                     <input hidden name="vote_up" value="{{ i.id }}">
-                   <input type="submit" class="btn btn-success" value="+">
+{#                    <input type="submit" class="btn btn-success" value="+">#}
+                    <button type="submit" class="just-glyph btn-success">
+                        <i class="fa fa-thumbs-o-up fa-2x"></i>
+                    </button>
                 </form>
 
                 <strong>Rating: {{ i.get_rating }}</strong>
@@ -86,7 +138,9 @@
 
                 <form method="POST" {% if user.is_authenticated %} action="#post_{{ i.id }} {% endif %}">{% csrf_token %}
                     <input hidden name="vote_down" value="{{ i.id }}">
-                    <input type="submit" class="btn btn-danger" value="-">
+{#                    <input type="submit" class="btn btn-danger" value="-">#}
+                        <button type="submit" class="just-glyph btn-danger">
+                        <i class="fa fa-thumbs-o-down fa-2x"></i>
                 </form>
             </div>
 
@@ -95,7 +149,7 @@
                 <h3>{{ i.title }}</h3> <br>
                         <span><small>{{ i.updated|timesince }} ago</small>
 
-                    <p>Author:<a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a></p></span>
+                    <p>Author:<a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a> <a href="{% url 'mail_to' i.user.id %}"> <i class="fa fa-envelope-o"></i></a></p></span>
 
 
                 <div class="thumbnail">

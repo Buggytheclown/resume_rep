@@ -35,6 +35,8 @@ urlpatterns = [
     url(r'^contact/$', views.contact, name='contact'),
     url(r'^profile/$', views.profile, name='profile'),
     url(r'^(?P<user_id>\d+)/profile/$', views.view_profile, name='view_profile'),
+    url(r'^my_mails/$', views.my_mails, name='my_mails'),
+    url(r'^(?P<user_id>\d+)/mail_to/$', views.mail_to, name='mail_to'),
     ]
 
 if settings.DEBUG:

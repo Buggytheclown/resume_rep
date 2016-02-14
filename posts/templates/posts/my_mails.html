@@ -1,0 +1,69 @@
+{% extends 'posts/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    My mails
+{% endblock %}
+
+{#{% block content %}#}
+{#    {% if mails %}#}
+{#        {% for mail in mails %}#}
+{#            {{ mail.sender }}<br>#}
+{#            {{ mail.timestamp }}<br>#}
+{#            {{ mail.content }}<br>#}
+{#            <hr>#}
+{#        {% endfor %}#}
+{#    {% else %}#}
+{#        <p>Sorry, you don't have any message</p>#}
+{#    {% endif %}#}
+{#{% endblock %}#}
+{% block content_title %}
+    <div class=" container-fluid" style="margin-top: -20px">
+        <div class="jumbotron">
+            <h2 class="text-center">My message</h2>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if mails %}
+        {% for mail in mails %}
+            <div class="row">
+                <div class="col-sm-1 col-sm-offset-3">
+                    <div class="thumbnail">
+                        {% if mail.sender.profilemodel.avatar %}
+                            <img class="img-responsive user-photo" src="{{ mail.sender.profilemodel.avatar.url }}">
+                        {% else %}
+                            <img class="img-responsive user-photo" src="{% static 'posts/img/unregistered.png' %}">
+                        {% endif %}
+                    </div><!-- /thumbnail -->
+                </div><!-- /col-sm-1 -->
+
+                <div class="col-sm-5 ">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong><a
+                                    href="{% url 'view_profile' mail.sender_id %}"> {{ mail.sender }} </a><a href="{% url 'mail_to' mail.sender_id %}"> <i class="fa fa-envelope-o"></i></a></strong> <span
+                                class="text-muted"> sended {{ mail.timestamp|timesince }} ago </span>
+
+                        </div>
+                        <div class="panel-body">
+                            {{ mail.content |linebreaks }}
+                        </div><!-- /panel-body -->
+                    </div><!-- /panel panel-default -->
+                </div><!-- /col-sm-5 -->
+                <div class="col-sm-1">
+                    <form method="POST"> {% csrf_token %}
+                        <input hidden type="text" name="delete" value="{{ mail.id }}">
+                        <input type="submit" value="Delete" class="btn btn-xs btn-danger">
+                    </form>
+                </div>
+            </div><!-- /row -->
+        {% endfor %}
+    {% else %}
+        <div class="col-sm-4 col-sm-offset-4">
+            <p>Sorry, you don't have any message.</p>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,7 +1,8 @@
 from django import forms
 
-from .models import Post, ContactModel, ProfileModel, CommentModel
+from .models import Post, ContactModel, ProfileModel, CommentModel, MailModel
 from django.contrib.admin import widgets
+
 
 class CommentModelForm(forms.ModelForm):
     class Meta:

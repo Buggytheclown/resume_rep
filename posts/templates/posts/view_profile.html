@@ -21,7 +21,7 @@
             <li class="list-group-item"> Username - {{ user_profile }} </li>
             <li class="list-group-item"> First name - {{ user_profile.first_name }} </li>
             <li class="list-group-item"> Last name - {{ user_profile.last_name }} </li>
-            <li class="list-group-item"> Gender - {{ user_profile.gender }} </li>
+            <li class="list-group-item"> Gender - {{ user_profile.get_gender_display }} </li>
         </ul>
     </div>
     <div class="col-sm-4 col-sm-offset-2  blog-main" style="margin-top: 50px">

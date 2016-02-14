@@ -4,9 +4,41 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.datastructures import MultiValueDictKeyError
+from django.db.models import Q
 
 from .form import PostModel, ContactForm, ProfileForm, CommentModelForm
-from posts.models import Post, ProfileModel, CommentModel, PlusModel, MinusModel, ContactModel
+from posts.models import Post, ProfileModel, CommentModel, PlusModel, MinusModel, ContactModel, MailModel
+
+
+def my_mails(request):
+    mails = MailModel.objects.all().filter(recipient=request.user).order_by('-timestamp')
+    messageid = request.POST.get('delete','')
+    if request.method == 'POST' and request.POST.get('delete',''):
+        message = get_object_or_404(MailModel, id=messageid)
+        message.delete()
+    context = {
+        'mails': mails,
+    }
+    return render(request, 'posts/my_mails.html', context)
+
+
+def mail_to(request, user_id):
+    send = False
+    to_user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST' and request.user.is_authenticated() and request.POST.get('content', ''):
+        form = MailModel(
+            recipient=to_user,
+            sender=request.user,
+            content=request.POST.get('content')
+        )
+        form.save()
+        messages.success(request, 'You message was successfully sended')
+        send = True
+    context = {
+        'send':send,
+        'to_user':to_user
+    }
+    return render(request, 'posts/mail_to.html', context)
 
 
 def view_profile(request, user_id):
@@ -69,18 +101,25 @@ def contact(request):
 
 
 def posts_list(request, sort=''):
+    # if user dont have profile
+    if request.user.is_authenticated():
+        try:
+            profile = request.user.profilemodel
+        except ProfileModel.DoesNotExist:
+            profile = ProfileModel(user=request.user)
+            profile.save()
     # sort
     if not sort:
         model_title = Post.objects.all()
     elif sort == 'top':
         unsorted_results = Post.objects.all()
-        model_title = sorted(unsorted_results, key= lambda t: t.get_rating(), reverse=True)
+        model_title = sorted(unsorted_results, key=lambda t: t.get_rating(), reverse=True)
     elif sort == 'old':
         model_title = Post.objects.all().reverse()
-     # paginator
+    # paginator
     query = request.GET.get('q')
     if query:
-        model_title = Post.objects.all().filter(title__icontains=query)
+        model_title = Post.objects.all().filter(Q(title__icontains=query) | Q(content__icontains=query))
     paginator = Paginator(model_title, 5)
     page = request.GET.get('page')
     try:
@@ -162,7 +201,7 @@ def posts_detail(request, id=None):
         pre_form.in_post_id = id
         pre_form.save()
         form = CommentModelForm()
-        #return HttpResponseRedirect(instance.get_absolute_url())
+        # return HttpResponseRedirect(instance.get_absolute_url())
 
     # rating in post, user can vote by adding 1 to plus OR 1 minus
     vote_up = request.POST.get('vote_up', '')
