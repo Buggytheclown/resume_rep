@@ -6,21 +6,40 @@
     padding-right:10px
     }
 
+    .mailForm{
+    z-index: 10;
+    }
+
     .just-glyph {
     padding-left:15px
+    }
+
+    .voteup {
+    color:green;
+    text-shadow: black 2px 2px 5px;
+    }
+
+    .votedown{
+    color: red;
+    text-shadow: black 2px 2px 5px;
+    }
+
+    .voteForm button  {
+    -moz-outline-style: none;
+    outline:none;
+    outline:0;
+    padding-top:10px;
+    background-color:transparent;
+    border:none;
+{#    font-size:30px;#}
+{#    float:right;#}
+    color:#333333;
     }
 {% endblock %}
 
 {% block title %}
     Home
 {% endblock %}
-
-{#{% block content %}#}
-{#{% for i in model_title %}#}
-{#   <h2><a href="{{ i.get_absolute_url }}">{{ i.title }}</a> <small>{{ i.updated|timesince }} ago</small></h2>#}
-{#    <p>{{ i.content|linebreaks|truncatechars:500 }}</p><br>#}
-{#{% endfor %}#}
-{#{% endblock %}#}
 
 
 {% block active_home %}
@@ -124,32 +143,57 @@
     {% for i in model_title %}
         <div class="row" style="margin-top: 50px">
 
-            <div class="col-sm-2" id="post_{{ i.id }}">
-                <form method="POST" {% if user.is_authenticated %} action="#post_{{ i.id }} {% endif %}">{% csrf_token %}
+            <div class="col-sm-2 forVote" id="post_{{ i.id }}">   {#  .forVote, div in JS #}
+                <form class="voteForm" method="POST">{% csrf_token %}  {# .voteForm in Jquery AJAX #}
                     <input hidden name="vote_up" value="{{ i.id }}">
-{#                    <input type="submit" class="btn btn-success" value="+">#}
-                    <button type="submit" class="just-glyph btn-success">
-                        <i class="fa fa-thumbs-o-up fa-2x"></i>
+                    <button type="submit" class="just-glyph plus"> {# .just-glyph, plus in JS #}
+                        <i class="fa fa-plus fa-2x"></i>           {# children('i') in JS #}
                     </button>
                 </form>
 
-                <strong>Rating: {{ i.get_rating }}</strong>
+                <strong>Rating:</strong> <strong id="rating_{{ i.id }}"> {{ i.get_rating }}</strong>  {# id='rating_/d' in Jquery AJAX #}
                 <br>
 
-                <form method="POST" {% if user.is_authenticated %} action="#post_{{ i.id }} {% endif %}">{% csrf_token %}
+                <form class="voteForm" method="POST">{% csrf_token %}   {# .voteForm in Jquery AJAX #}
                     <input hidden name="vote_down" value="{{ i.id }}">
-{#                    <input type="submit" class="btn btn-danger" value="-">#}
-                        <button type="submit" class="just-glyph btn-danger">
-                        <i class="fa fa-thumbs-o-down fa-2x"></i>
+                    <button type="submit" class="just-glyph minus">  {# .just-glyph, .minus in JS #}
+                        <i class="fa fa-minus fa-2x"></i>            {# children('i') in JS #}
+                    </button>
                 </form>
             </div>
 
 
             <div class="col-sm-10">
                 <h3>{{ i.title }}</h3> <br>
-                        <span><small>{{ i.updated|timesince }} ago</small>
+                        <small>{{ i.updated|timesince }} ago</small>
 
-                    <p>Author:<a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a> <a href="{% url 'mail_to' i.user.id %}"> <i class="fa fa-envelope-o"></i></a></p></span>
+{# -------------------------------hidden mail_to------------------------------------------------#}
+                <div id="mail_{{ i.id }}" data-id="{{ i.user.id }}" class="col-sm-6 col-sm-offset-2 mailForm"
+                     style="display: none; position: absolute; background-color: rgba(47, 88, 121, 0.60)"> {# #mail_/d, .mailForm in JS #}
+                    <form  class="form-horizontal mailForm" method="POST" data-id="{{ i.user.id }}">{% csrf_token %}   {# .mailForm in JS #}
+                        <div class="form-group">
+                            <label for="name" class="col-sm-4 control-label">Send to</label>
+                            <div class="col-sm-5" style="margin-top: 10px">
+                                <strong>{{ i.user }}</strong>
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-sm-12">
+                                <textarea class="form-control" rows="5" id="message" name="content"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-6">
+                                <input name="submit" type="submit" value="Send" class="btn btn-primary">
+                                <input name="close" value="Close" type="button" class="btn btn-danger closeMail"> {# input.closeMail in JS #}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+{# end --------------------------hidden mail_to------------------------------------------------#}
+
+                    <p>Author:<a href="{% url 'view_profile' i.user.id %}"> {{ i.user }} </a> <a href="{% url 'mail_to' i.user.id %}"> <i data-postid="{{ i.id }}" data-userid="{{ i.user.id }}"  class="mail_to fa fa-envelope-o"></i></a></p>
 
 
                 <div class="thumbnail">

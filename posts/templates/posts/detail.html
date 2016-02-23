@@ -35,24 +35,63 @@
     border-right-color:#ddd;
     border-width:8px;
     }
+
+    .fa {
+    padding-right:10px
+    }
+
+    .mailForm{
+    z-index: 10;
+    }
+
+    .just-glyph {
+    padding-left:15px
+    }
+
+    .voteup {
+    color:green;
+    text-shadow: black 2px 2px 5px;
+    }
+
+    .votedown{
+    color: red;
+    text-shadow: black 2px 2px 5px;
+    }
+
+    .voteForm button  {
+    -moz-outline-style: none;
+    outline:none;
+    outline:0;
+    padding-top:10px;
+    background-color:transparent;
+    border:none;
+    {#    font-size:30px;#}
+    {#    float:right;#}
+    color:#333333;
+    }
 {% endblock %}
 
 {% block content %}
 
     <div class="row" style="margin-top: 50px">
 
-        <div class="col-sm-2">
-            <form method="POST">{% csrf_token %}
+        <div class="col-sm-2 forVote" id="post_{{ instance.id }}">   {#  .forVote, div in JS #}
+            <form class="voteForm" method="POST">{% csrf_token %} {# .voteForm in Jquery AJAX #}
                 <input hidden name="vote_up" value="{{ instance.id }}">
-                <input type="submit" class="btn btn-success" value="+">
+                <button type="submit" class="just-glyph plus"> {# .just-glyph, plus in JS #}
+                    <i class="fa fa-plus fa-2x"></i> {# children('i') in JS #}
+                </button>
             </form>
 
-            <strong>Rating: {{ instance.get_rating }}</strong>
+            <strong>Rating:</strong> <strong id="rating_{{ instance.id }}"> {{ instance.get_rating }}</strong>
+            {# id='rating_/d' in Jquery AJAX #}
             <br>
 
-            <form method="POST">{% csrf_token %}
+            <form class="voteForm" method="POST">{% csrf_token %} {# .voteForm in Jquery AJAX #}
                 <input hidden name="vote_down" value="{{ instance.id }}">
-                <input type="submit" class="btn btn-danger" value="-">
+                <button type="submit" class="just-glyph minus">  {# .just-glyph, .minus in JS #}
+                    <i class="fa fa-minus fa-2x"></i> {# children('i') in JS #}
+                </button>
             </form>
         </div>
 

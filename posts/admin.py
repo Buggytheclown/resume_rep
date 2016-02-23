@@ -27,5 +27,13 @@ class CommentModelAdmin (admin.ModelAdmin):
     list_filter = ['in_post',]
 admin.site.register(CommentModel, CommentModelAdmin)
 
-admin.site.register(PlusModel)
-admin.site.register(MinusModel)
+
+class PlusModelAdmin (admin.ModelAdmin):
+    list_display = ['on_rating', 'user_plus']
+    list_filter = ['on_rating','user_plus']
+admin.site.register(PlusModel, PlusModelAdmin)
+
+class MinusModelAdmin (admin.ModelAdmin):
+    list_display = ['on_rating', 'user_minus']
+    list_filter = ['on_rating','user_minus']
+admin.site.register(MinusModel, MinusModelAdmin)
